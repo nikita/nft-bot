@@ -3,9 +3,12 @@ require("dotenv").config();
 // Import filesystem module
 const fs = require("fs");
 // Import discord.js module
-const { Client, Intents } = require("discord.js");
+const Discord = require("discord.js");
+const { Client, Intents } = Discord;
 // Create a new client instance
-const client = new Client({ intents: [Intents.FLAGS.GUILDS] });
+const client = new Client({
+  intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
+});
 
 // Commands will be stored in the client instance
 client.commands = new Discord.Collection();
@@ -30,13 +33,13 @@ client.once("ready", () => {
 });
 
 // When the client gets a message event, run this code
-client.on("message", (msg) => {
+client.on("messageCreate", (msg) => {
   // Message does not start with our prefix or if message author is a bot dont run
-  if (!msg.content.startsWith(prefix) || msg.author.bot) return;
+  if (!msg.content.startsWith(process.env.PREFIX) || msg.author.bot) return;
 
   // Split the space between the command prefix and the command the user requested
   // Example: "!print hello" = "[print, hello]"
-  const args = msg.content.slice(prefix.length).trim().split(" ");
+  const args = msg.content.slice(process.env.PREFIX.length).trim().split(" ");
   // Remove the first element from the array and lowercase it as command name
   const commandName = args.shift().toLowerCase();
 
@@ -51,7 +54,7 @@ client.on("message", (msg) => {
     command.execute(msg, args);
   } catch (error) {
     console.error(error);
-    msg.reply("there was an error trying to execute that command!");
+    msg.reply("There was an error trying to execute that command!");
   }
 });
 
